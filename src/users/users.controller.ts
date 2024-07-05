@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Patch,
@@ -14,10 +15,15 @@ import { UsersService } from './users.service';
 import { Role } from './users.service';
 import { CreateUserDto } from './dto/create.users.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
+import { Logger } from 'winston';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
+  ) {}
 
   /**
    * Method: GET
@@ -27,6 +33,7 @@ export class UsersController {
    */
   @Get()
   getUsers(@Query('role') role?: Role) {
+    this.logger.log('info', 'get all users');
     return this.usersService.getUsers(role);
   }
 
@@ -56,7 +63,10 @@ export class UsersController {
    * @param id @type {number}, @param body @type {object}
    */
   @Patch(':id')
-  updateUser(@Param( 'id', ParseIntPipe) id: number, @Body(ValidationPipe) body: UpdateUserDto) {
+  updateUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) body: UpdateUserDto,
+  ) {
     return this.usersService.updateUser(id, body);
   }
 

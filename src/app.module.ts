@@ -7,11 +7,18 @@ import { DatabaseModule } from './database/database.module';
 import { EmployeesModule } from './employees/employees.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import {WINSTON_MODULE_PROVIDER, WinstonModule} from 'nest-winston';
-import { logger } from './helpers/winston.logger';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 
 @Module({
   imports: [
+    WinstonModule.forRoot({
+      format: winston.format.json(),
+      level: 'debug',
+      transports: [
+        new winston.transports.Console(),
+      ]
+    }),
     UsersModule,
     LoginModule,
     DatabaseModule,
@@ -39,13 +46,7 @@ import { logger } from './helpers/winston.logger';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-
-    {
-      provide: WINSTON_MODULE_PROVIDER,
-      useValue: logger
-    }
-  ],
-  
+  ]
 
 })
 export class AppModule {}
